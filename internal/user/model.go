@@ -1,15 +1,26 @@
 package user
 
+import "time"
+
 type User struct {
-	ID       int    `db:"id"`
-	Username string `db:"username"`
-	Password string `db:"password"`
+	UserID       string     `db:"user_id"`
+	Name         string     `db:"name"`
+	Dummy        string     `db:"dummy_col_1"`
+	Email        *string    `db:"email"`
+	PhoneNumber  *string    `db:"phone_number"`
+	ProfileImage *string    `db:"profile_image"`
+	PinCode      string     `db:"pin_code"`
+	Password     string     `db:"password"`
+	CreatedAt    *time.Time `db:"created_at"`
 }
 
 func (u *User) ToUserResponse() UserResponseDTO {
 	return UserResponseDTO{
-		ID:       u.ID,
-		Username: u.Username,
-		Password: u.Password,
+		UserID:       u.UserID,
+		Name:         u.Name,
+		Dummy:        u.Dummy,
+		Email:        u.Email,
+		PhoneNumber:  u.PhoneNumber,
+		ProfileImage: u.ProfileImage,
 	}
 }

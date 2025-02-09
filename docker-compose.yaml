@@ -6,25 +6,31 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydatabase
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      MYSQL_DATABASE: line-bk
+      MYSQL_USER: user-bk
+      MYSQL_PASSWORD: password-bk
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./initdb:/docker-entrypoint-initdb.d
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my_backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      REDIS_ADDR: "localhost:6379"
+      DATABASE_URL: "user-bk:password-bk@tcp(127.0.0.1:3306)/line-bk"
+      JWT_SECRET: "secret"
+      JWT_EXPIRED: "24"
+      JWT_ISSUER: "line-bk"
 
-#   backend:
-#     build: ./backend
-#     container_name: my_backend
-#     restart: always
-#     depends_on:
-#       - db
-#     environment:
-#       DATABASE_URL: "mysql://myuser:mypassword@db:3306/mydatabase"
-#     ports:
-#       - "8080:8080"
+    ports:
+      - "8888:8888"
 
 volumes:
   mysql_data:

@@ -1,0 +1,348 @@
+definitions:
+  internal_auth.LoginResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  internal_auth.LoginWithPasswordRequest:
+    properties:
+      password:
+        example: "123456"
+        type: string
+      user_id:
+        example: 000018b0e1a211ef95a30242ac180002
+        type: string
+    required:
+    - password
+    - user_id
+    type: object
+  internal_auth.LoginWithPinCodeRequest:
+    properties:
+      pin_code:
+        example: "123456"
+        type: string
+      user_id:
+        example: 000018b0e1a211ef95a30242ac180002
+        type: string
+    required:
+    - pin_code
+    - user_id
+    type: object
+  internal_user.UserResponseDTO:
+    properties:
+      dummy_col_1:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      profile_image:
+        type: string
+      user_id:
+        type: string
+    type: object
+  line-bk-api_pkg_utils.AppError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  line-bk-api_pkg_utils.AppPaginationResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      limit:
+        type: integer
+      message:
+        type: string
+      next_page:
+        type: integer
+      page:
+        type: integer
+      prev_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  line-bk-api_pkg_utils.AppResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server for LINE BK API.
+  title: LINE BK API
+  version: "1.0"
+paths:
+  /api/v1/auth/login/password:
+    post:
+      consumes:
+      - application/json
+      description: Login with password
+      parameters:
+      - description: Login with password request
+        in: body
+        name: loginWithPasswordRequest
+        required: true
+        schema:
+          $ref: '#/definitions/internal_auth.LoginWithPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_auth.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+      summary: Login with password
+      tags:
+      - auth
+  /api/v1/auth/login/pin:
+    post:
+      consumes:
+      - application/json
+      description: Login with pin code
+      parameters:
+      - description: Login with pin code request
+        in: body
+        name: loginWithPinCodeRequest
+        required: true
+        schema:
+          $ref: '#/definitions/internal_auth.LoginWithPinCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_auth.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+      summary: Login with pin code
+      tags:
+      - auth
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of users
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_user.UserResponseDTO'
+                  type: array
+                limit:
+                  type: integer
+                page:
+                  type: integer
+                total:
+                  type: integer
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      summary: Get all users
+      tags:
+      - Users
+  /api/v1/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_user.UserResponseDTO'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      summary: Get a user by ID
+      tags:
+      - Users
+  /api/v1/users/me:
+    get:
+      consumes:
+      - application/json
+      description: Get my profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_user.UserResponseDTO'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get my profile
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

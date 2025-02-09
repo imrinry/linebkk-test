@@ -8,6 +8,7 @@ build:
 
 # Run the application
 run:
+	swag init -g cmd/main.go --parseDependency --parseInternal
 	$(GO) run cmd/main.go
 
 # Clean build files
