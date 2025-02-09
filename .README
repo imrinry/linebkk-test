@@ -1,0 +1,22 @@
+# LINE BK Assignment
+
+## Database Schema
+
+The database consists of several tables:
+
+- `users`: Stores basic user information
+- `user_greetings`: Contains personalized greetings for users
+- `accounts`: Main account information
+- `account_balances`: Tracks account monetary balances
+- `account_details`: Additional account properties
+- `account_flags`: Stores various account flags/settings
+- `transactions`: Records transaction history
+- `debit_cards`: Basic debit card information
+- `debit_card_status`: Tracks card status
+- `debit_card_details`: Additional card properties
+- `debit_card_design`: Card design/appearance settings
+- `banners`: Marketing/promotional banners
+
+## Setup
+
+1. Install dependencies:
