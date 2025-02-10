@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"line-bk-api/config"
 	"time"
 
@@ -42,10 +41,6 @@ func ValidateAccessToken(tokenString string) (string, error) {
 	})
 	if err != nil {
 		return "", err
-	}
-
-	if !token.Valid {
-		return "", errors.New("invalid token")
 	}
 
 	return token.Claims.(jwt.MapClaims)["sub"].(string), nil
