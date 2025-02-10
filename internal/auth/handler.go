@@ -22,8 +22,9 @@ func NewAuthHandler(authService AuthService) AuthHandler {
 // @Summary Login with pin code
 // @Description Login with pin code
 // @Accept json
-// @Tags auth
+// @Tags Authentication
 // @Produce json
+// @Security ApiKeyAuth
 // @Param loginWithPinCodeRequest body LoginWithPinCodeRequest true "Login with pin code request"
 // @Success 200 {object} utils.AppResponse{data=LoginResponse}
 // @Failure 400 {object} utils.AppError{message=string}
@@ -49,8 +50,9 @@ func (h *authHandler) LoginWithPinCode(c *fiber.Ctx) error {
 // @Summary Login with password
 // @Description Login with password
 // @Accept json
-// @Tags auth
+// @Tags Authentication
 // @Produce json
+// @Security ApiKeyAuth
 // @Param loginWithPasswordRequest body LoginWithPasswordRequest true "Login with password request"
 // @Success 200 {object} utils.AppResponse{data=LoginResponse}
 // @Failure 400 {object} utils.AppError{message=string}

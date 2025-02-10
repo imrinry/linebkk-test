@@ -2,7 +2,9 @@ package main
 
 import (
 	"line-bk-api/config"
+	"line-bk-api/internal/account"
 	"line-bk-api/internal/auth"
+	"line-bk-api/internal/banner"
 	"line-bk-api/internal/user"
 	"line-bk-api/routes"
 	"log"
@@ -21,8 +23,11 @@ import (
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
-// @description Type "Bearer" followed by a space and JWT token.
-// @scheme bearer
+// @description Enter the token with the prefix **"Bearer "**, e.g., "Bearer {your_token}"
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name X-API-KEY
+// @description The API key for the LINE BK API.
 func main() {
 	config.LoadEnv()
 	config.ConnectDB()
@@ -57,8 +62,15 @@ func main() {
 	authService := auth.NewAuthService(authRepo, userRepo)
 	authHandler := auth.NewAuthHandler(authService)
 
+	accountRepo := account.NewAccountRepository(config.GetDBInstance())
+	accountService := account.NewAccountService(accountRepo)
+	accountHandler := account.NewHandler(accountService)
 
-	routes.SetupRoutes(app, userHandler, authHandler)
+	bannerRepo := banner.NewBannerRepository(config.GetDBInstance())
+	bannerService := banner.NewBannerService(bannerRepo)
+	bannerHandler := banner.NewBannerHandler(bannerService)
+
+	routes.SetupRoutes(app, userHandler, authHandler, accountHandler, bannerHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }

@@ -9,6 +9,7 @@ import (
 type UserService interface {
 	GetUsers(page, limit int) ([]UserResponseDTO, int, error)
 	GetUserByID(id string) (UserResponseDTO, error)
+	GetUserGreeting(id string, page, limit int) ([]UserGreetingResponseDTO, int, error)
 }
 
 type service struct {
@@ -20,7 +21,7 @@ func NewUserService(userRepo UserRepository) UserService {
 }
 
 func (s *service) GetUsers(page, limit int) ([]UserResponseDTO, int, error) {
-	offset := utils.GetOffset(page, limit)
+	offset, limit := utils.GetOffset(page, limit)
 	users, err := s.userRepo.GetAllUsers(offset, limit)
 	if err != nil {
 		logs.Error(err)
@@ -64,4 +65,25 @@ func validateUserID(id string) error {
 		return utils.NewBadRequestError("user id is required")
 	}
 	return nil
+}
+
+func (s *service) GetUserGreeting(id string, page, limit int) ([]UserGreetingResponseDTO, int, error) {
+	offset, limit := utils.GetOffset(page, limit)
+	greetings, err := s.userRepo.GetUserGreeting(id, offset, limit)
+	if err != nil {
+		logs.Error(err)
+		return nil, 0, utils.NewUnexpectedError()
+	}
+	total, err := s.userRepo.GetUserGreetingCount(id)
+	if err != nil {
+		logs.Error(err)
+		return nil, 0, utils.NewUnexpectedError()
+	}
+
+	greetingResponses := make([]UserGreetingResponseDTO, len(greetings))
+	for i, greeting := range greetings {
+		greetingResponses[i] = greeting.ToUserGreetingResponse()
+	}
+
+	return greetingResponses, total, nil
 }

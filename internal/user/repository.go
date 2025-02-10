@@ -8,6 +8,8 @@ type UserRepository interface {
 	GetAllUsers(offset, limit int) ([]User, error)
 	GetCountUsers() (int, error)
 	GetUserByID(id string) (User, error)
+	GetUserGreeting(id string, offset, limit int) ([]UserGreeting, error)
+	GetUserGreetingCount(id string) (int, error)
 }
 
 type repository struct {
@@ -58,4 +60,39 @@ func (r *repository) GetUserByID(id string) (User, error) {
 		return User{}, err
 	}
 	return user, nil
+}
+
+func (r *repository) GetUserGreeting(id string, offset, limit int) ([]UserGreeting, error) {
+	var greetings []UserGreeting
+	rows, err := r.db.Queryx(`
+		SELECT 
+			user_id, 
+			greeting, 
+			dummy_col_2 
+		FROM 
+			user_greetings 
+		WHERE 
+			user_id = ? 
+		ORDER BY 
+			greeting DESC 
+		LIMIT ?, ?`, id, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var greeting UserGreeting
+		if err := rows.Scan(&greeting.UserID, &greeting.Greeting, &greeting.Dummy); err != nil {
+			return nil, err
+		}
+		greetings = append(greetings, greeting)
+	}
+	return greetings, nil
+}
+
+func (r *repository) GetUserGreetingCount(id string) (int, error) {
+	var count int
+	err := r.db.Get(&count, "SELECT COUNT(*) FROM user_greetings WHERE user_id = ?", id)
+	return count, err
 }

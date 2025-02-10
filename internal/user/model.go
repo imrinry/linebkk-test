@@ -24,3 +24,15 @@ func (u *User) ToUserResponse() UserResponseDTO {
 		ProfileImage: u.ProfileImage,
 	}
 }
+
+type UserGreeting struct {
+	UserID   string `db:"user_id"`
+	Greeting string `db:"greeting"`
+	Dummy    string `db:"dummy_col_2"`
+}
+
+func (u *UserGreeting) ToUserGreetingResponse() UserGreetingResponseDTO {
+	return UserGreetingResponseDTO{
+		Greeting: u.Greeting,
+	}
+}

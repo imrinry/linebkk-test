@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"line-bk-api/internal/user"
 	"line-bk-api/pkg/logs"
 	"line-bk-api/pkg/utils"
@@ -22,7 +21,6 @@ func NewAuthService(authRepository AuthRepository, userRepository user.UserRepos
 }
 
 func (s *authService) LoginWithPinCode(userID string, pinCode string) (LoginResponse, error) {
-	fmt.Println("LoginWithPinCode", userID, pinCode)
 	user, err := s.userRepository.GetUserByID(userID)
 	if err != nil {
 		return LoginResponse{}, err

@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func GetOffset(page, limit int) int {
+func GetOffset(page, limit int) (int, int) {
 	// if page is less than 1, set it to default page
 	if page < 1 {
 		page = config.DefaultPage
@@ -15,7 +15,7 @@ func GetOffset(page, limit int) int {
 	limit = GetLimit(limit)
 
 	// calculate offset
-	return (page - 1) * limit
+	return (page - 1) * limit, limit
 }
 
 func GetLimit(limit int) int {

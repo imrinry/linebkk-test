@@ -17,6 +17,7 @@ var (
 	AccessTokenExpired  string
 	RefreshTokenExpired string
 	JWTIssuer           string
+	X_API_KEY           string
 )
 
 func LoadEnv() {
@@ -30,4 +31,6 @@ func LoadEnv() {
 	AccessTokenExpired = os.Getenv("ACCESS_TOKEN_EXPIRED")
 	RefreshTokenExpired = os.Getenv("REFRESH_TOKEN_EXPIRED")
 	JWTIssuer = os.Getenv("JWT_ISSUER")
+	X_API_KEY = os.Getenv("X_API_KEY")
+
 }
