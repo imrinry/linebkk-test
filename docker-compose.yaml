@@ -1,19 +1,5 @@
 version: "3.9"
 services:
-  db:
-    image: mysql:8
-    container_name: my_mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: line-bk
-      MYSQL_USER: user-bk
-      MYSQL_PASSWORD: password-bk
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./initdb:/docker-entrypoint-initdb.d
   backend:
     build:
       context: .
@@ -21,16 +7,27 @@ services:
     container_name: my_backend
     restart: always
     depends_on:
-      - db
+      - redis
     environment:
-      REDIS_ADDR: "localhost:6379"
-      DATABASE_URL: "user-bk:password-bk@tcp(127.0.0.1:3306)/line-bk"
+      REDIS_ADDR: "redis:6379"
+      DATABASE_URL: "root:jarindeveloper@tcp(34.87.36.121:3306)/linebk?parseTime=true"
       JWT_SECRET: "secret"
-      JWT_EXPIRED: "24"
+      ACCESS_TOKEN_EXPIRED: "15h"
+      REFRESH_TOKEN_EXPIRED: "24h"
       JWT_ISSUER: "line-bk"
-
+      X_API_KEY: "123"
+      PORT: "8000"
     ports:
-      - "8888:8888"
+      - "8000:8000"
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
 
 volumes:
-  mysql_data:
+  redis_data:

@@ -10,6 +10,7 @@ import (
 	"line-bk-api/internal/user"
 	"line-bk-api/routes"
 	"log"
+	"os"
 	"time"
 
 	_ "line-bk-api/docs"
@@ -21,7 +22,7 @@ import (
 // @title LINE BK API
 // @version 1.0
 // @description This is a sample server for LINE BK API.
-// @host localhost:8080
+// @host localhost:8000
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
@@ -83,5 +84,5 @@ func main() {
 
 	routes.SetupRoutes(app, userHandler, authHandler, accountHandler, bannerHandler, transactionHandler, debitCardHandler)
 
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(":" + os.Getenv("PORT")))
 }

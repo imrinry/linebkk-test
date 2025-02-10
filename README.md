@@ -1,141 +1,154 @@
-# JarinDeveloper X LineBK Assignment
 
-## Prerequisites
-- Docker
-- Docker Compose
+# 🚀 JarinDeveloper X LineBK Assignment  
 
+## 📌 Prerequisites  
+✅ **Docker**  
+✅ **Docker Compose**  
 
-## Technologies
-- Golang
-- Fiber
-- SQLx
-- MySQL
-- Redis
-- Docker
+---
 
-## Database Schema Changes
+## 🛠 Technologies  
+- 🐹 **Golang**  
+- ⚡ **Fiber**  
+- 🛢 **SQLx & MySQL**  
+- 🔥 **Redis**  
+- 🐳 **Docker**  
 
-### Users Table Additional Fields
+---
 
-| Field Name | Type | Reason |
-|-----------|------|--------|
-| `phone_number` | VARCHAR(100) | Allow user contact information |
-| `profile_image` | VARCHAR(255) | Store user profile picture URL |
-| `pin_code` | VARCHAR(100) | Authentication/Security feature |
-| `password` | VARCHAR(100) | User account authentication |
-| `created_at` | TIMESTAMP | Track user account creation time |
+## 🏗 Database Schema Changes  
 
-### Account Details Table
-| Field Name | Type | Reason |
-|-----------|------|--------|
-| `account_nickname` | VARCHAR(100) | Optional user-defined account name |
+### 🧑‍💻 Users Table (New Fields)  
+| 🏷 Field Name | 🛠 Type | 🔎 Reason |
+|--------------|--------|----------|
+| 📞 `phone_number` | VARCHAR(100) | Store user contact information |
+| 🖼 `profile_image` | VARCHAR(255) | Store user profile picture URL |
+| 🔑 `pin_code` | VARCHAR(100) | Security and authentication feature |
+| 🔒 `password` | VARCHAR(100) | User account authentication |
+| ⏳ `created_at` | TIMESTAMP | Track account creation date |
 
-### Account Flags Table
-| Field Name | Type | Reason |
-|-----------|------|--------|
-| `created_at` | TIMESTAMP | Record creation timestamp |
-| `updated_at` | TIMESTAMP | Track last update time |
+### 🏦 Account Details Table  
+| 🏷 Field Name | 🛠 Type | 🔎 Reason |
+|--------------|--------|----------|
+| 🏷 `account_nickname` | VARCHAR(100) | Optional user-defined account name |
 
-### Debit Card Status Table
-| Field Name | Type | Reason |
-|-----------|------|--------|
-| `blocked_reason` | VARCHAR(255) | Reason for card blocking |
+### ⚠️ Account Flags Table  
+| 🏷 Field Name | 🛠 Type | 🔎 Reason |
+|--------------|--------|----------|
+| 📌 `created_at` | TIMESTAMP | Record creation timestamp |
+| 🔄 `updated_at` | TIMESTAMP | Track last update time |
 
-### Debit Cards Table
-| Field Name | Type | Reason |
-|-----------|------|--------|
-| `card_type` | ENUM('virtual','physical') | Distinguish card type |
-| `issue_at` | TIMESTAMP | Card issuance date |
-| `expired_at` | TIMESTAMP | Card expiration date |
+### 💳 Debit Card Status Table  
+| 🏷 Field Name | 🛠 Type | 🔎 Reason |
+|--------------|--------|----------|
+| 🚫 `blocked_reason` | VARCHAR(255) | Reason for blocking the card |
 
+### 💰 Debit Cards Table  
+| 🏷 Field Name | 🛠 Type | 🔎 Reason |
+|--------------|--------|----------|
+| 🏷 `card_type` | ENUM('virtual','physical') | Differentiate between virtual and physical cards |
+| 📅 `issue_at` | TIMESTAMP | Card issuance date |
+| ⏳ `expired_at` | TIMESTAMP | Card expiration date |
 
-## ER Diagram
-![ER Diagram](https://storage.googleapis.com/wirtual-dev/Screenshot%202568-02-10%20at%2023.33.11.png)
+---
 
-## Database Initialization
+## 📊 ER Diagram  
+![ER Diagram](https://storage.googleapis.com/wirtual-dev/Screenshot%202568-02-10%20at%2023.33.11.png)  
 
-### Schema and Initial Data
+---
 
-**Important Note**: 
-- Large database schema and initial rows were imported directly to Google Cloud Platform
-- No local initialization required during Docker setup
-- This approach ensures clean, pre-populated database without manual import steps
+## 🗄 Database Initialization  
 
+⚡ **No manual setup required!**  
+✅ The database schema and initial data are already imported to **Google Cloud Platform**  
+✅ No need to import data locally  
 
-## Environment Configuration
+---
 
-**No Manual Environment Setup Required**
-- All necessary environment variables pre-configured in `docker-compose.yml`
-- Just run `docker-compose up` and you're ready to go
+## ⚙️ Environment Configuration  
 
-## Backend Configuration
+🚫 **No manual environment setup needed!**  
+- All required environment variables are **pre-configured** in `docker-compose.yml`  
+- Just run the following command, and you're ready to go:  
 
-### Port Configuration
-- **Backend Port**: 8080
-- **Redis Port**: 6379
-
-### Docker Compose Setup
-- Ensure ports 8080 and 6379 are available on your local machine
-- No additional environment setup required
-- Only prerequisite is Docker installed
-
-### Port Availability Check
 ```bash
-# Check if ports 8080 and 6379 are free
-sudo lsof -i :8080
+docker-compose up -d --build
+```
+
+---
+
+## 🔥 Backend Configuration  
+
+### 📍 Port Configuration  
+- **Backend:** `8000`  
+- **Redis:** `6379`  
+
+### 📌 Docker Compose Setup  
+🔎 Ensure ports `8000` and `6379` are available before starting:  
+```bash
+sudo lsof -i :8000
 sudo lsof -i :6379
 ```
+✅ If the ports are occupied, stop conflicting services or modify `docker-compose.yml`.  
 
-**Note**: If ports are in use, stop conflicting services or change port mappings in `docker-compose.yml`
+---
 
-## API Documentation
+## 📜 API Documentation  
 
-### Swagger UI
-- Access: `localhost:8080/swagger/`
+### 🛠 Swagger UI  
+- URL: [`localhost:8000/swagger/`](http://localhost:8000/swagger/)  
 
-### Authentication Process
+### 🔑 Authentication Process  
 
-#### Login Requirements
-1. **X-API-KEY**
-   - Pre-configured in environment variables
-   - Value: `123`
+#### 🏷 Login Requirements  
+✅ **X-API-KEY**: `123` (pre-configured)  
 
-#### Authentication Flow
-1. Provide X-API-KEY during login
-2. Receive `access_token`
-3. Use `access_token` in Authorization header
-   - Format: `Bearer [access_token]`
+#### 🔄 Authentication Flow  
+1️⃣ Include `X-API-KEY` in the request  
+2️⃣ Receive an `access_token`  
+3️⃣ Use `access_token` in the header  
+   ```http
+   Authorization: Bearer [access_token]
+   ```
+4️⃣ Access the API via Swagger 🚀  
 
-### Swagger Usage
-- Include `X-API-KEY` and `Authorization` header in API requests
-- Refer to Swagger UI for endpoint details
+---
 
+## 🧪 Testing  
 
-## Testing
-
-### Unit Testing
+### 🛠 Unit Testing  
 ```bash
 go test ./...
-
 ```
 
+---
 
-## Quick Start Guide
+## 🚀 Quick Start Guide  
 
-### Steps
-1. Pull repository code
-2. Run `docker-compose up -d`
-3. Open Swagger UI: `localhost:8080/swagger/`
+1️⃣ **Clone the repository**  
+2️⃣ **Run the backend**  
+```bash
+docker-compose up -d
+```
+3️⃣ **Open Swagger UI**  
+   - [`localhost:8000/swagger/`](http://localhost:8000/swagger/)  
 
-## Login Credentials
+---
 
-**Important Note**: 
-- For ALL users, both PIN and password are set to `123456`
-- This is a default setting to simplify testing and review process
+## 🔐 Login Credentials  
 
-### Login Options
-- Login with PIN
-- Login with Password
+⚠️ **For testing purposes:**  
+- **PIN & Password**: `123456`  
+- The default `user_id` is pre-configured in Swagger for easy testing  
 
-### Note
-- Default `user_id` pre-configured in Swagger for easy testing
+✅ **Login Options**  
+1️⃣ **Login with PIN**  
+2️⃣ **Login with Password**  
+
+---
+
+## 📊 K6 Performance Testing  
+
+![K6 Performance Testing](https://storage.googleapis.com/wirtual-dev/Screenshot%202568-02-11%20at%2000.27.17.png)  
+
+---

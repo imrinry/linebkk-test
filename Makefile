@@ -46,7 +46,7 @@ docker-build:
 	docker build -t $(BINARY_NAME) .
 
 docker-run:
-	docker run -p 8080:8080 $(BINARY_NAME)
+	docker run -p 8000:8000 $(BINARY_NAME)
 
 # Default target
 .PHONY: build run clean test test-coverage deps tidy lint docker-build docker-run
