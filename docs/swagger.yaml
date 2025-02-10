@@ -101,6 +101,73 @@ definitions:
       title:
         type: string
     type: object
+  internal_debit_cards.DebitCardDesignResponse:
+    properties:
+      border_color:
+        type: string
+      card_id:
+        type: string
+      color:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardDetailsResponse:
+    properties:
+      card_id:
+        type: string
+      issuer:
+        type: string
+      number:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardResponse:
+    properties:
+      card_id:
+        type: string
+      card_type:
+        type: string
+      debit_card_design:
+        $ref: '#/definitions/internal_debit_cards.DebitCardDesignResponse'
+      debit_card_details:
+        $ref: '#/definitions/internal_debit_cards.DebitCardDetailsResponse'
+      debit_card_status:
+        $ref: '#/definitions/internal_debit_cards.DebitCardStatusResponse'
+      expired_at:
+        type: string
+      issue_at:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardStatusResponse:
+    properties:
+      blocked_reason:
+        type: string
+      card_id:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_transactions.TransactionResponse:
+    properties:
+      image:
+        type: string
+      is_bank:
+        type: integer
+      name:
+        type: string
+      transaction_id:
+        type: string
+      user_id:
+        type: string
+    type: object
   internal_user.UserGreetingResponseDTO:
     properties:
       greeting:
@@ -395,6 +462,130 @@ paths:
       summary: Get banner by user id
       tags:
       - Banner
+  /api/v1/debit-cards:
+    get:
+      consumes:
+      - application/json
+      description: Get debit cards
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_debit_cards.DebitCardResponse'
+                  type: array
+                limit:
+                  type: integer
+                next_page:
+                  type: integer
+                page:
+                  type: integer
+                prev_page:
+                  type: integer
+                total:
+                  type: integer
+                total_pages:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get debit cards
+      tags:
+      - DebitCard
+  /api/v1/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get transactions by user ID
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_transactions.TransactionResponse'
+                  type: array
+                limit:
+                  type: integer
+                page:
+                  type: integer
+                total:
+                  type: integer
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get transactions by user ID
+      tags:
+      - Transactions
   /api/v1/users/greetings:
     get:
       description: Get user greeting

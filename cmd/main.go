@@ -5,6 +5,8 @@ import (
 	"line-bk-api/internal/account"
 	"line-bk-api/internal/auth"
 	"line-bk-api/internal/banner"
+	"line-bk-api/internal/debit_cards"
+	"line-bk-api/internal/transactions"
 	"line-bk-api/internal/user"
 	"line-bk-api/routes"
 	"log"
@@ -70,7 +72,15 @@ func main() {
 	bannerService := banner.NewBannerService(bannerRepo)
 	bannerHandler := banner.NewBannerHandler(bannerService)
 
-	routes.SetupRoutes(app, userHandler, authHandler, accountHandler, bannerHandler)
+	transactionRepo := transactions.NewTransactionRepository(config.GetDBInstance())
+	transactionService := transactions.NewTransactionService(transactionRepo)
+	transactionHandler := transactions.NewTransactionHandler(transactionService)
+
+	debitCardRepo := debit_cards.NewDebitCardRepository(config.GetDBInstance())
+	debitCardService := debit_cards.NewDebitCardService(debitCardRepo)
+	debitCardHandler := debit_cards.NewDebitCardHandler(debitCardService)
+
+	routes.SetupRoutes(app, userHandler, authHandler, accountHandler, bannerHandler, transactionHandler, debitCardHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }
