@@ -8,6 +8,7 @@ build:
 
 # Run the application
 run:
+	swag init -g cmd/main.go --parseDependency --parseInternal
 	$(GO) run cmd/main.go
 
 # Clean build files
@@ -18,7 +19,7 @@ clean:
 
 # Run tests
 test:
-	$(GO) test -v ./...
+	$(GO) test -v ./... -cover
 
 test-bench:
 	$(GO) test -v -bench=. ./...	

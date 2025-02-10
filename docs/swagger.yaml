@@ -1,0 +1,705 @@
+definitions:
+  internal_account.AccountBalanceResponse:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+    type: object
+  internal_account.AccountDetailResponse:
+    properties:
+      account_id:
+        type: string
+      account_nickname:
+        type: string
+      color:
+        type: string
+      is_main_account:
+        type: boolean
+      progress:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  internal_account.AccountFlagResponse:
+    properties:
+      account_id:
+        type: string
+      flag_id:
+        type: string
+      flag_type:
+        type: string
+      flag_value:
+        type: string
+    type: object
+  internal_account.AccountResponse:
+    properties:
+      account_balance:
+        $ref: '#/definitions/internal_account.AccountBalanceResponse'
+      account_detail:
+        $ref: '#/definitions/internal_account.AccountDetailResponse'
+      account_flag:
+        items:
+          $ref: '#/definitions/internal_account.AccountFlagResponse'
+        type: array
+      account_id:
+        type: string
+      account_number:
+        type: string
+      currency:
+        type: string
+      issuer:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_auth.LoginResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  internal_auth.LoginWithPasswordRequest:
+    properties:
+      password:
+        example: "123456"
+        type: string
+      user_id:
+        example: 000018b0e1a211ef95a30242ac180002
+        type: string
+    required:
+    - password
+    - user_id
+    type: object
+  internal_auth.LoginWithPinCodeRequest:
+    properties:
+      pin_code:
+        example: "123456"
+        type: string
+      user_id:
+        example: 000018b0e1a211ef95a30242ac180002
+        type: string
+    required:
+    - pin_code
+    - user_id
+    type: object
+  internal_banner.BannerResponse:
+    properties:
+      banner_id:
+        type: string
+      description:
+        type: string
+      image:
+        type: string
+      title:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardDesignResponse:
+    properties:
+      border_color:
+        type: string
+      card_id:
+        type: string
+      color:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardDetailsResponse:
+    properties:
+      card_id:
+        type: string
+      issuer:
+        type: string
+      number:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardResponse:
+    properties:
+      card_id:
+        type: string
+      card_type:
+        type: string
+      debit_card_design:
+        $ref: '#/definitions/internal_debit_cards.DebitCardDesignResponse'
+      debit_card_details:
+        $ref: '#/definitions/internal_debit_cards.DebitCardDetailsResponse'
+      debit_card_status:
+        $ref: '#/definitions/internal_debit_cards.DebitCardStatusResponse'
+      expired_at:
+        type: string
+      issue_at:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_debit_cards.DebitCardStatusResponse:
+    properties:
+      blocked_reason:
+        type: string
+      card_id:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_transactions.TransactionResponse:
+    properties:
+      image:
+        type: string
+      is_bank:
+        type: integer
+      name:
+        type: string
+      transaction_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  internal_user.UserGreetingResponseDTO:
+    properties:
+      greeting:
+        type: string
+    type: object
+  internal_user.UserResponseDTO:
+    properties:
+      dummy_col_1:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      profile_image:
+        type: string
+      user_id:
+        type: string
+    type: object
+  line-bk-api_pkg_utils.AppError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  line-bk-api_pkg_utils.AppPaginationResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      limit:
+        type: integer
+      message:
+        type: string
+      next_page:
+        type: integer
+      page:
+        type: integer
+      prev_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  line-bk-api_pkg_utils.AppResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server for LINE BK API.
+  title: LINE BK API
+  version: "1.0"
+paths:
+  /api/v1/accounts/me:
+    get:
+      consumes:
+      - application/json
+      description: Get account my account
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_account.AccountResponse'
+                  type: array
+                limit:
+                  type: integer
+                next_page:
+                  type: integer
+                page:
+                  type: integer
+                prev_page:
+                  type: integer
+                total:
+                  type: integer
+                total_pages:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get account my account
+      tags:
+      - Account
+  /api/v1/auth/login/password:
+    post:
+      consumes:
+      - application/json
+      description: Login with password
+      parameters:
+      - description: Login with password request
+        in: body
+        name: loginWithPasswordRequest
+        required: true
+        schema:
+          $ref: '#/definitions/internal_auth.LoginWithPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_auth.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Login with password
+      tags:
+      - Authentication
+  /api/v1/auth/login/pin:
+    post:
+      consumes:
+      - application/json
+      description: Login with pin code
+      parameters:
+      - description: Login with pin code request
+        in: body
+        name: loginWithPinCodeRequest
+        required: true
+        schema:
+          $ref: '#/definitions/internal_auth.LoginWithPinCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_auth.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                message:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Login with pin code
+      tags:
+      - Authentication
+  /api/v1/banners:
+    get:
+      consumes:
+      - application/json
+      description: Get banner by user id
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_banner.BannerResponse'
+                  type: array
+                limit:
+                  type: integer
+                next_page:
+                  type: integer
+                page:
+                  type: integer
+                prev_page:
+                  type: integer
+                total:
+                  type: integer
+                total_pages:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get banner by user id
+      tags:
+      - Banner
+  /api/v1/debit-cards:
+    get:
+      consumes:
+      - application/json
+      description: Get debit cards
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_debit_cards.DebitCardResponse'
+                  type: array
+                limit:
+                  type: integer
+                next_page:
+                  type: integer
+                page:
+                  type: integer
+                prev_page:
+                  type: integer
+                total:
+                  type: integer
+                total_pages:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get debit cards
+      tags:
+      - DebitCard
+  /api/v1/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get transactions by user ID
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_transactions.TransactionResponse'
+                  type: array
+                limit:
+                  type: integer
+                page:
+                  type: integer
+                total:
+                  type: integer
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get transactions by user ID
+      tags:
+      - Transactions
+  /api/v1/users/greetings:
+    get:
+      description: Get user greeting
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppPaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_user.UserGreetingResponseDTO'
+                  type: array
+                limit:
+                  type: integer
+                page:
+                  type: integer
+                total:
+                  type: integer
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get user greeting
+      tags:
+      - Users
+  /api/v1/users/profile/me:
+    get:
+      consumes:
+      - application/json
+      description: Get my profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_user.UserResponseDTO'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/line-bk-api_pkg_utils.AppError'
+            - properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+              type: object
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get my profile
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    description: The API key for the LINE BK API.
+    in: header
+    name: X-API-KEY
+    type: apiKey
+  BearerAuth:
+    description: Enter the token with the prefix **"Bearer "**, e.g., "Bearer {your_token}"
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

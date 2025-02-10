@@ -15,10 +15,12 @@ func ConnectDB() {
 	DB, err = sqlx.Open("mysql", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		logs.Error(err)
+		panic(err)
 	}
 
 	if err = DB.Ping(); err != nil {
 		logs.Error(err)
+		panic(err)
 	}
 
 	logs.Info("Connected to Database")

@@ -1,6 +1,9 @@
 package utils
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+)
 
 type AppError struct {
 	Code    int
@@ -10,6 +13,10 @@ type AppError struct {
 func (e AppError) Error() string {
 	return e.Message
 }
+
+var (
+	ErrRedisNil = errors.New("redis: nil")
+)
 
 func NewNotFoundError(message string) error {
 	return AppError{
