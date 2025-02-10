@@ -19,7 +19,7 @@ clean:
 
 # Run tests
 test:
-	$(GO) test -v ./...
+	$(GO) test -v ./... -cover
 
 test-bench:
 	$(GO) test -v -bench=. ./...	

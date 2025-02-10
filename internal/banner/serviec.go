@@ -19,12 +19,11 @@ func NewBannerService(bannerRepository BannerRepository) BannerService {
 }
 
 func (s *bannerService) GetBannerByUserID(ctx context.Context, userID string, page int, limit int) ([]BannerResponse, int, error) {
-
 	offset, limit := utils.GetOffset(page, limit)
 	banner, err := s.bannerRepository.GetBannerByUserID(ctx, userID, offset, limit)
 	if err != nil {
 		logs.Error(err)
-		return nil, 0, err
+		return []BannerResponse{}, 0, err
 	}
 	bannerResponses := make([]BannerResponse, len(banner))
 	for i, b := range banner {
@@ -33,8 +32,7 @@ func (s *bannerService) GetBannerByUserID(ctx context.Context, userID string, pa
 
 	total, err := s.bannerRepository.GetTotalBannerByUserID(ctx, userID)
 	if err != nil {
-		logs.Error(err)
-		return nil, 0, err
+		return bannerResponses, 0, err
 	}
 
 	return bannerResponses, total, nil
