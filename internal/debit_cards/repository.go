@@ -2,28 +2,30 @@ package debit_cards
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 )
 
 type DebitCardRepository interface {
 	GetDebitCardByUserID(ctx context.Context, userID string, offset int, limit int) ([]DebitCard, error)
 	GetCountDebitCards(ctx context.Context, userID string) (int, error)
+	SetDebitCardCache(ctx context.Context, key string, value []DebitCardResponse, expiration time.Duration) error
+	GetDebitCardCache(ctx context.Context, key string) ([]DebitCardResponse, error)
 }
 
 type debitCardRepository struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	redis *redis.Client
 }
 
-func NewDebitCardRepository(db *sqlx.DB) *debitCardRepository {
-	return &debitCardRepository{db: db}
+func NewDebitCardRepository(db *sqlx.DB, redis *redis.Client) *debitCardRepository {
+	return &debitCardRepository{db: db, redis: redis}
 }
 
 func (r *debitCardRepository) GetDebitCardByUserID(ctx context.Context, userID string, offset int, limit int) ([]DebitCard, error) {
-	fmt.Println("userID", userID)
-	fmt.Println("offset", offset)
-	fmt.Println("limit", limit)
 
 	var debitCards []DebitCard
 	query := `
@@ -68,8 +70,6 @@ func (r *debitCardRepository) GetDebitCardByUserID(ctx context.Context, userID s
 		debitCards = append(debitCards, debitCard)
 	}
 
-	fmt.Println("debitCards repository", debitCards)
-
 	return debitCards, nil
 }
 
@@ -83,4 +83,25 @@ func (r *debitCardRepository) GetCountDebitCards(ctx context.Context, userID str
 		return 0, err
 	}
 	return count, nil
+}
+
+func (r *debitCardRepository) SetDebitCardCache(ctx context.Context, key string, value []DebitCardResponse, expiration time.Duration) error {
+	jsonValue, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return r.redis.Set(ctx, key, jsonValue, expiration).Err()
+}
+
+func (r *debitCardRepository) GetDebitCardCache(ctx context.Context, key string) ([]DebitCardResponse, error) {
+	value, err := r.redis.Get(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	var debitCards []DebitCardResponse
+	err = json.Unmarshal([]byte(value), &debitCards)
+	if err != nil {
+		return nil, err
+	}
+	return debitCards, nil
 }

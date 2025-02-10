@@ -34,7 +34,7 @@ func (h *Handler) GetMyAccount(c *fiber.Ctx) error {
 	page := c.QueryInt("page", config.DefaultPage)
 	limit := c.QueryInt("limit", config.DefaultLimit)
 
-	accounts, total, err := h.accountService.GetAccountByUserID(userID, page, limit)
+	accounts, total, err := h.accountService.GetAccountByUserID(c.Context(), userID, page, limit)
 	if err != nil {
 		return utils.HandleError(c, err)
 	}

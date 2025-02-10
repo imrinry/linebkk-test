@@ -33,6 +33,7 @@ import (
 func main() {
 	config.LoadEnv()
 	config.ConnectDB()
+	config.ConnectRedis()
 
 	app := fiber.New()
 
@@ -64,19 +65,19 @@ func main() {
 	authService := auth.NewAuthService(authRepo, userRepo)
 	authHandler := auth.NewAuthHandler(authService)
 
-	accountRepo := account.NewAccountRepository(config.GetDBInstance())
+	accountRepo := account.NewAccountRepository(config.GetDBInstance(), config.GetRedisInstance())
 	accountService := account.NewAccountService(accountRepo)
 	accountHandler := account.NewHandler(accountService)
 
-	bannerRepo := banner.NewBannerRepository(config.GetDBInstance())
+	bannerRepo := banner.NewBannerRepository(config.GetDBInstance(), config.GetRedisInstance())
 	bannerService := banner.NewBannerService(bannerRepo)
 	bannerHandler := banner.NewBannerHandler(bannerService)
 
-	transactionRepo := transactions.NewTransactionRepository(config.GetDBInstance())
+	transactionRepo := transactions.NewTransactionRepository(config.GetDBInstance(), config.GetRedisInstance())
 	transactionService := transactions.NewTransactionService(transactionRepo)
 	transactionHandler := transactions.NewTransactionHandler(transactionService)
 
-	debitCardRepo := debit_cards.NewDebitCardRepository(config.GetDBInstance())
+	debitCardRepo := debit_cards.NewDebitCardRepository(config.GetDBInstance(), config.GetRedisInstance())
 	debitCardService := debit_cards.NewDebitCardService(debitCardRepo)
 	debitCardHandler := debit_cards.NewDebitCardHandler(debitCardService)
 

@@ -1,23 +1,31 @@
 package account
 
 import (
+	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 )
 
 type AccountRepository interface {
-	GetAccountByUserID(userID string, offset int, limit int) ([]Account, error)
-	GetCountAccounts(userID string) (int, error)
+	GetAccountByUserID(ctx context.Context, userID string, offset int, limit int) ([]Account, error)
+	GetCountAccounts(ctx context.Context, userID string) (int, error)
+	SetAccountCache(ctx context.Context, key string, value []AccountResponse, expiration time.Duration) error
+	GetAccountCache(ctx context.Context, key string) ([]AccountResponse, error)
 }
 
 type repository struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	redis *redis.Client
 }
 
-func NewAccountRepository(db *sqlx.DB) AccountRepository {
-	return &repository{db: db}
+func NewAccountRepository(db *sqlx.DB, redis *redis.Client) AccountRepository {
+	return &repository{db: db, redis: redis}
 }
 
-func (r *repository) GetAccountByUserID(userID string, offset int, limit int) ([]Account, error) {
+func (r *repository) GetAccountByUserID(ctx context.Context, userID string, offset int, limit int) ([]Account, error) {
 
 	var accounts []Account
 	query := `
@@ -95,8 +103,29 @@ func (r *repository) GetAccountByUserID(userID string, offset int, limit int) ([
 	return accounts, nil
 }
 
-func (r *repository) GetCountAccounts(userID string) (int, error) {
+func (r *repository) GetCountAccounts(ctx context.Context, userID string) (int, error) {
 	var count int
 	err := r.db.Get(&count, "SELECT COUNT(*) FROM accounts WHERE user_id = ?", userID)
 	return count, err
+}
+
+func (r *repository) SetAccountCache(ctx context.Context, key string, value []AccountResponse, expiration time.Duration) error {
+	jsonValue, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return r.redis.Set(ctx, key, jsonValue, expiration).Err()
+}
+
+func (r *repository) GetAccountCache(ctx context.Context, key string) ([]AccountResponse, error) {
+	value, err := r.redis.Get(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	var accounts []AccountResponse
+	err = json.Unmarshal([]byte(value), &accounts)
+	if err != nil {
+		return nil, err
+	}
+	return accounts, nil
 }

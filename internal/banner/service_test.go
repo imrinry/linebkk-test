@@ -1,82 +1,177 @@
-package banner
+package banner_test
 
 import (
 	"context"
 	"errors"
+	"line-bk-api/internal/banner"
+	"line-bk-api/pkg/utils"
 	"testing"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGetBannerByUserID(t *testing.T) {
-
-	// Arrange
-	mockRepo := NewMockBannerRepository()
-
-	mockRepo.On("GetBannerByUserID", context.Background(), "1", 0, 10).Return([]Banner{
+	tests := []struct {
+		name          string
+		userID        string
+		page          int
+		limit         int
+		cacheKey      string
+		cacheHit      bool
+		cachedData    []banner.BannerResponse
+		mockBanner    []banner.Banner
+		mockBannerErr error
+		mockTotal     int
+		mockTotalErr  error
+		expectedTotal int
+		expectedErr   string
+	}{
 		{
-			BannerID:    "1",
-			UserID:      "1",
-			Title:       "Banner 1",
-			Description: "Description 1",
-			Image:       "Image 1",
+			name:     "success get banner from db",
+			userID:   "user1",
+			page:     1,
+			limit:    10,
+			cacheKey: "banner:user1:0:10",
+			cacheHit: false,
+			mockBanner: []banner.Banner{
+				{
+					BannerID:    "1",
+					UserID:      "user1",
+					Title:       "Banner 1",
+					Description: "Description 1",
+					Image:       "image1.jpg",
+				},
+			},
+			mockTotal:     1,
+			expectedTotal: 1,
 		},
-	}, nil)
-
-	mockRepo.On("GetTotalBannerByUserID", context.Background(), "1").Return(1, nil)
-
-	service := NewBannerService(mockRepo)
-
-	banners, total, err := service.GetBannerByUserID(context.Background(), "1", 0, 10)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
+		{
+			name:     "success get banner from cache",
+			userID:   "user1",
+			page:     1,
+			limit:    10,
+			cacheKey: "banner:user1:0:10",
+			cacheHit: true,
+			cachedData: []banner.BannerResponse{
+				{
+					BannerID:    "1",
+					Title:       "Banner 1",
+					Description: "Description 1",
+					Image:       "image1.jpg",
+				},
+			},
+			expectedTotal: 0,
+		},
+		{
+			name:          "error getting banner from db",
+			userID:        "user1",
+			page:          1,
+			limit:         10,
+			cacheKey:      "banner:user1:0:10",
+			cacheHit:      false,
+			mockBannerErr: errors.New("db error"),
+			expectedErr:   "db error",
+		},
+		{
+			name:     "error getting total banner count",
+			userID:   "user1",
+			page:     1,
+			limit:    10,
+			cacheKey: "banner:user1:0:10",
+			cacheHit: false,
+			mockBanner: []banner.Banner{
+				{
+					BannerID:    "1",
+					UserID:      "user1",
+					Title:       "Banner 1",
+					Description: "Description 1",
+					Image:       "image1.jpg",
+				},
+			},
+			mockTotalErr: errors.New("total count error"),
+			expectedErr:  "total count error",
+		},
+		{
+			name:     "error getting banner from cache",
+			userID:   "user1",
+			page:     1,
+			limit:    10,
+			cacheKey: "banner:user1:0:10",
+			cacheHit: false,
+			mockBanner: []banner.Banner{
+				{
+					BannerID:    "1",
+					UserID:      "user1",
+					Title:       "Banner 1",
+					Description: "Description 1",
+					Image:       "image1.jpg",
+				},
+			},
+			mockTotal:     1,
+			expectedTotal: 1,
+		},
 	}
 
-	assert.Equal(t, 1, total)
-	assert.Equal(t, "1", banners[0].BannerID)
-	assert.Equal(t, "Banner 1", banners[0].Title)
-	assert.Equal(t, "Description 1", banners[0].Description)
-	assert.Equal(t, "Image 1", banners[0].Image)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			mockRepo := banner.NewMockBannerRepository()
+			offset, limit := utils.GetOffset(tt.page, tt.limit)
 
+			if !tt.cacheHit {
+				mockRepo.On("GetBannerCache", context.Background(), tt.cacheKey).Return([]banner.BannerResponse{}, redis.Nil)
+				mockRepo.On("GetBannerByUserID", context.Background(), tt.userID, offset, limit).Return(tt.mockBanner, tt.mockBannerErr)
+				if tt.mockBannerErr == nil {
+					mockRepo.On("GetTotalBannerByUserID", context.Background(), tt.userID).Return(tt.mockTotal, tt.mockTotalErr)
+					if tt.mockTotalErr == nil {
+						mockRepo.On("SetBannerCache", context.Background(), tt.cacheKey, mock.Anything, 5*time.Minute).Return(nil)
+					}
+				}
+			} else {
+				mockRepo.On("GetBannerCache", context.Background(), tt.cacheKey).Return(tt.cachedData, nil)
+			}
+
+			service := banner.NewBannerService(mockRepo)
+
+			// Act
+			banners, total, err := service.GetBannerByUserID(context.Background(), tt.userID, tt.page, tt.limit)
+
+			// Assert
+			if tt.expectedErr != "" {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedErr, err.Error())
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedTotal, total)
+
+			if tt.cacheHit {
+				assert.Equal(t, tt.cachedData, banners)
+			} else if len(banners) > 0 {
+				expectedResponses := make([]banner.BannerResponse, len(tt.mockBanner))
+				for i, b := range tt.mockBanner {
+					expectedResponses[i] = b.ToBannerResponse()
+				}
+				assert.Equal(t, expectedResponses, banners)
+			}
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
 }
 
-func TestGetBannerByUserID_Error(t *testing.T) {
+func TestNewBannerService(t *testing.T) {
 	// Arrange
-	mockRepo := NewMockBannerRepository()
+	mockRepo := banner.NewMockBannerRepository()
 
-	mockRepo.On("GetBannerByUserID", context.Background(), "1", 0, 10).Return([]Banner{}, errors.New("error"))
-	mockRepo.On("GetTotalBannerByUserID", context.Background(), "1").Return(0, errors.New("error"))
+	// Act
+	service := banner.NewBannerService(mockRepo)
 
-	service := NewBannerService(mockRepo)
-
-	banners, total, err := service.GetBannerByUserID(context.Background(), "1", 0, 10)
-
-	assert.Empty(t, banners)
-	assert.Equal(t, 0, total)
-	assert.Equal(t, "error", err.Error())
-}
-
-func TestGetBannerByUserID_CountError(t *testing.T) {
-	// Arrange
-	mockRepo := NewMockBannerRepository()
-
-	mockRepo.On("GetBannerByUserID", context.Background(), "1", 0, 10).Return([]Banner{
-		{
-			BannerID:    "1",
-			UserID:      "1",
-			Title:       "Banner 1",
-			Description: "Description 1",
-			Image:       "Image 1",
-		},
-	}, nil)
-
-	mockRepo.On("GetTotalBannerByUserID", context.Background(), "1").Return(0, errors.New("error"))
-
-	service := NewBannerService(mockRepo)
-
-	_, _, err := service.GetBannerByUserID(context.Background(), "1", 0, 10)
-
-	// assert.Empty(t, banners)
-	// assert.Equal(t, 0, total)
-	assert.Equal(t, "error", err.Error())
+	// Assert
+	assert.NotNil(t, service)
+	assert.Implements(t, (*banner.BannerService)(nil), service)
 }

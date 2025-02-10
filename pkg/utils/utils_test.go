@@ -1,9 +1,11 @@
 package utils_test
 
 import (
+	"errors"
 	"fmt"
 	"line-bk-api/config"
 	"line-bk-api/pkg/utils"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
@@ -11,9 +13,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
+	"github.com/valyala/fasthttp"
 )
 
-func TestGetOffset(t *testing.T) {
+func TestGetOffset1(t *testing.T) {
 	tests := []struct {
 		name       string
 		page       int
@@ -60,7 +63,7 @@ func TestGetOffset(t *testing.T) {
 	}
 }
 
-func TestGetLimit(t *testing.T) {
+func TestGetLimit2(t *testing.T) {
 	tests := []struct {
 		name      string
 		limit     int
@@ -91,7 +94,7 @@ func TestGetLimit(t *testing.T) {
 	}
 }
 
-func TestGetTotalPages(t *testing.T) {
+func TestGetTotalPages2(t *testing.T) {
 	tests := []struct {
 		name      string
 		total     int
@@ -126,7 +129,7 @@ func TestGetTotalPages(t *testing.T) {
 	}
 }
 
-func TestGetNextPage(t *testing.T) {
+func TestGetNextPage2(t *testing.T) {
 	tests := []struct {
 		name         string
 		page         int
@@ -155,7 +158,7 @@ func TestGetNextPage(t *testing.T) {
 	}
 }
 
-func TestGetPreviousPage(t *testing.T) {
+func TestGetPreviousPage2(t *testing.T) {
 	tests := []struct {
 		name             string
 		page             int
@@ -181,7 +184,7 @@ func TestGetPreviousPage(t *testing.T) {
 	}
 }
 
-func TestNotFoundError(t *testing.T) {
+func TestNotFoundError2(t *testing.T) {
 	tests := []struct {
 		name        string
 		message     string
@@ -207,7 +210,7 @@ func TestNotFoundError(t *testing.T) {
 	}
 }
 
-func TestUnexpectedError(t *testing.T) {
+func TestUnexpectedError2(t *testing.T) {
 	tests := []struct {
 		name        string
 		wantCode    int
@@ -231,7 +234,7 @@ func TestUnexpectedError(t *testing.T) {
 	}
 }
 
-func TestValidationError(t *testing.T) {
+func TestValidationError2(t *testing.T) {
 	tests := []struct {
 		name        string
 		message     string
@@ -257,7 +260,7 @@ func TestValidationError(t *testing.T) {
 	}
 }
 
-func TestBadRequestError(t *testing.T) {
+func TestBadRequestError2(t *testing.T) {
 	tests := []struct {
 		name        string
 		message     string
@@ -283,7 +286,7 @@ func TestBadRequestError(t *testing.T) {
 	}
 }
 
-func TestAppError_Error_Message(t *testing.T) {
+func TestAppError_Error_Message2(t *testing.T) {
 	tests := []struct {
 		name        string
 		appError    utils.AppError
@@ -306,7 +309,7 @@ func TestAppError_Error_Message(t *testing.T) {
 	}
 }
 
-func TestHandleResponse(t *testing.T) {
+func TestHandleResponse2(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       interface{}
@@ -462,3 +465,31 @@ func TestValidateAccessToken(t *testing.T) {
 	assert.Error(t, err, "Expected an error when validating an invalid token")
 	assert.Empty(t, validatedUserID, "Validated user ID should be empty when token is invalid")
 }
+
+func TestHandleError(t *testing.T) {
+	app := fiber.New()
+	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})
+	defer app.ReleaseCtx(ctx)
+
+	// Test AppError case
+	appErr := utils.AppError{
+		Message: "Test error",
+		Code:    400,
+	}
+	err := utils.HandleError(ctx, appErr)
+	assert.NoError(t, err)
+	assert.Equal(t, 400, ctx.Response().StatusCode())
+
+	// Test generic error case
+	genericErr := errors.New("generic error")
+	err = utils.HandleError(ctx, genericErr)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusInternalServerError, ctx.Response().StatusCode())
+
+	// Test default case with nil error
+	err = utils.HandleError(ctx, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusInternalServerError, ctx.Response().StatusCode())
+}
+
+

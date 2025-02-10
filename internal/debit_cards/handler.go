@@ -1,7 +1,6 @@
 package debit_cards
 
 import (
-	"fmt"
 	"line-bk-api/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -42,7 +41,6 @@ func (h *debitCardHandler) GetDebitCards(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.HandleError(c, err)
 	}
-	fmt.Println("debitCards handler", debitCards)
 
 	return utils.HandleResponse(c, utils.AppPaginationResponse{
 		Message:    "success",
