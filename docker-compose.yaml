@@ -8,9 +8,10 @@ services:
     restart: always
     depends_on:
       - redis
+      - db
     environment:
       REDIS_ADDR: "redis:6379"
-      DATABASE_URL: "root:jarindeveloper@tcp(34.87.36.121:3306)/linebk?parseTime=true"
+      DATABASE_URL: "root:jarindeveloper@tcp(db:3306)/assignment?parseTime=true"
       JWT_SECRET: "secret"
       ACCESS_TOKEN_EXPIRED: "15h"
       REFRESH_TOKEN_EXPIRED: "24h"
@@ -29,5 +30,19 @@ services:
       - redis_data:/data
     restart: always
 
+  db:
+    image: mysql:8.0
+    container_name: assignment_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: jarindeveloper
+      MYSQL_DATABASE: assignment
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+
 volumes:
   redis_data:
+  db_data:
